@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Comment=
+Exec=env SDL_VIDEODRIVER=x11 /usr/share/games/quake3/quake3e.x64
+Icon=quake3
+Name=Quake 3 Enchanced
+Path=/usr/share/games/quake3
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Game;Shooter;
