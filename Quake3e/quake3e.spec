@@ -1,12 +1,14 @@
+%global commitdate 20260213
+%global commithash 52198948ccf2a277beb591a8c0d8953af9f961ec
+%global shortcommit %(c=%{commithash}; echo ${c:0:7})
 %define debug_package %{nil}
-%define source_release 2025-10-14
 Name:           Quake3e
-Version:        0.%(echo  %{source_release}| tr -d '-')
+Version:        0~git%{commitdate}.%{shortcommit}
 Release:        %{autorelease}
 Summary:        Modern Quake III Arena engine
 License:        GPLv2
 URL:            https://github.com/ec-/Quake3e
-Source0:        %{url}/archive/refs/tags/%{source_release}.tar.gz
+Source:         %{url}/archive/%{commithash}/%{name}-%{shortcommit}.tar.gz
 Source1:        quake3e.desktop
 
 BuildRequires:  libXxf86dga-devel
@@ -23,7 +25,7 @@ This is a modern Quake III Arena engine aimed to be fast, secure and compatible 
 This package does not contain any game content.
 
 %prep
-%setup -n %{name}-%{source_release}
+%setup -n %{name}-%{commithash}
 
 %build
 make RENDERER_DEFAULT=vulkan
@@ -44,5 +46,8 @@ cp code/unix/quake3.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
 /usr/share/applications/quake3e.desktop
 
 %changelog
+* Wed Feb 18 2026 Przemysław Białek
+- changed source release version to commithash
+
 * Wed Feb 04 2026 Przemysław Białek
 - first release
