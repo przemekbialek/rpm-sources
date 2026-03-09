@@ -1,5 +1,5 @@
-%global commitdate 20260228
-%global commithash 46add7d088adf831d91bf3153f2be45b477560ea
+%global commitdate 20260309
+%global commithash d365778814dab588b8505220c5a444c8785112a3
 %global shortcommit %(c=%{commithash}; echo ${c:0:7})
 %define debug_package %{nil}
 Name:           Quake3e
@@ -46,6 +46,9 @@ cp code/unix/quake3.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
 /usr/share/applications/quake3e.desktop
 
 %changelog
+* Wed Mar 09 2026 Przemysław Białek
+- update to latest version
+
 * Wed Feb 28 2026 Przemysław Białek
 - update to latest version
 
