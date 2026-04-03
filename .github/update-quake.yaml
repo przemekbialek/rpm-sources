@@ -1,0 +1,81 @@
+name: Watch Quake3e and update spec (Conditional)
+on:
+  schedule:
+    - cron: '55 23 * * *' # Sprawdzanie co godzinę
+  workflow_dispatch: # Możliwość ręcznego uruchomienia
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bridge repo
+        uses: actions/checkout@v3
+
+      - name: Compare hashes and check for updates
+        id: check_update
+        run: |
+          CURRENT_SHA=$(grep 'commithash' quake3e.spec | awk '{print $3}')
+          echo "Current SHA in spec: $CURRENT_SHA"
+
+          LATEST_SHA=$(curl -s https://api.github.com/repos/ec-/Quake3e/commits/main | jq -r '.sha')
+          echo "Latest SHA on GitHub: $LATEST_SHA"
+
+          LATEST_DATE=$(curl -s https://api.github.com/repos/ec-/Quake3e/commits/main | jq -r '.commit.committer.date' | cut -d'T' -f1 | tr -d '-')
+
+          if [ "$LATEST_SHA" != "$CURRENT_SHA" ]; then
+            echo "New commit detected! Updating..."
+            echo "should_build=true" >> $GITHUB_OUTPUT
+            echo "sha=$LATEST_SHA" >> $GITHUB_OUTPUT
+            echo "date=$LATEST_DATE" >> $GITHUB_OUTPUT
+          else
+            echo "No changes detected. Skipping build."
+            echo "should_build=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update SPEC file
+        if: steps.check_update.outputs.should_build == 'true'
+        run: |
+          SHA=${{ steps.check_update.outputs.sha }}
+          DATE=${{ steps.check_update.outputs.date }}
+          
+          echo "Updating quake3e.spec to SHA: $SHA and Date: $DATE"
+          
+          # Aktualizacja zmiennych w pliku .spec [1]
+          sed -i "s/^%global commitdate .*/%global commitdate $DATE/" quake3e.spec
+          sed -i "s/^%global commithash .*/%global commithash $SHA/" quake3e.spec
+          
+      - name: Create Branch and Commit Changes
+        if: steps.check_update.outputs.should_build == 'true'
+        run: |
+          SHA=${{ steps.check_update.outputs.sha }}
+
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          branch_name="chore/update-spec-files-$SHA"
+          git checkout -b $branch_name
+          git add Quake3e/quake3e.spec
+          git commit -m "chore: Update spec files to Quake3e commit $SHA"
+          git push origin $branch_name
+
+      - name: Create Pull Request
+        if: steps.check_update.outputs.should_build == 'true'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const result = await github.rest.pulls.create({
+              owner,
+              repo,
+              title: `chore: Update spec files to Quake3e commit ${process.env.SHA}`,
+              body: `Automated PR to update spec files following release ${process.env.SHA}`,
+              head: `chore/update-spec-files-${process.env.SHA}`,
+              base: 'master'
+            });
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: result.data.number,
+              labels: ['copr-update']
+            });
+        env:
+          SHA: ${{ steps.check_update.outputs.sha }}
