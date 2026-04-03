@@ -14,7 +14,7 @@ jobs:
       - name: Compare hashes and check for updates
         id: check_update
         run: |
-          CURRENT_SHA=$(grep 'commithash' Quake3e/quake3e.spec | awk '{print $3}')
+          CURRENT_SHA=$(grep '^%global commithash' Quake3e/quake3e.spec | awk '{print $3}')
           echo "Current SHA in spec: $CURRENT_SHA"
 
           LATEST_SHA=$(curl -s https://api.github.com/repos/ec-/Quake3e/commits/main | jq -r '.sha')
