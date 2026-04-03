@@ -53,7 +53,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           branch_name="chore/update-spec-files-$SHA"
           git checkout -b $branch_name
-          git add .quake3e.spec
+          git add Quake3e/quake3e.spec
           git commit -m "chore: Update spec files to Quake3e commit $SHA"
           git push origin $branch_name
 
