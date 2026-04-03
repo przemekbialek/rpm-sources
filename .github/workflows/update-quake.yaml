@@ -69,7 +69,7 @@ jobs:
               title: `chore: Update spec files to Quake3e commit ${process.env.SHA}`,
               body: `Automated PR to update spec files following release ${process.env.SHA}`,
               head: `chore/update-spec-files-${process.env.SHA}`,
-              base: 'master'
+              base: 'main'
             });
             await github.rest.issues.addLabels({
               owner,
