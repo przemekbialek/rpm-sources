@@ -14,7 +14,7 @@ jobs:
       - name: Compare hashes and check for updates
         id: check_update
         run: |
-          CURRENT_SHA=$(grep 'commithash' quake3e.spec | awk '{print $3}')
+          CURRENT_SHA=$(grep 'commithash' Quake3e/quake3e.spec | awk '{print $3}')
           echo "Current SHA in spec: $CURRENT_SHA"
 
           LATEST_SHA=$(curl -s https://api.github.com/repos/ec-/Quake3e/commits/main | jq -r '.sha')
@@ -41,8 +41,8 @@ jobs:
           echo "Updating quake3e.spec to SHA: $SHA and Date: $DATE"
           
           # Aktualizacja zmiennych w pliku .spec [1]
-          sed -i "s/^%global commitdate .*/%global commitdate $DATE/" quake3e.spec
-          sed -i "s/^%global commithash .*/%global commithash $SHA/" quake3e.spec
+          sed -i "s/^%global commitdate .*/%global commitdate $DATE/" Quake3e/quake3e.spec
+          sed -i "s/^%global commithash .*/%global commithash $SHA/" Quake3e/quake3e.spec
           
       - name: Create Branch and Commit Changes
         if: steps.check_update.outputs.should_build == 'true'
@@ -53,7 +53,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           branch_name="chore/update-spec-files-$SHA"
           git checkout -b $branch_name
-          git add Quake3e/quake3e.spec
+          git add .quake3e.spec
           git commit -m "chore: Update spec files to Quake3e commit $SHA"
           git push origin $branch_name
 
