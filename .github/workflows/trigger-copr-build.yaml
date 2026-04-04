@@ -16,9 +16,10 @@ jobs:
 
       - name: Detect changed spec files and trigger webhooks
         env:
+          GH_TOKEN: ${{ github.token }}
           WEBHOOK_BASE_URL: ${{ secrets.COPR_WEBHOOK_URL }}
         run: |
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          CHANGED_FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files.[].path')
           
           echo "Files changed in merged PR: $CHANGED_FILES"
 
