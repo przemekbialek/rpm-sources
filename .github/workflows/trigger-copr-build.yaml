@@ -18,7 +18,7 @@ jobs:
         env:
           WEBHOOK_BASE_URL: ${{ secrets.COPR_WEBHOOK_URL }}
         run: |
-          CHANGED_FILES=$(git diff --name-only ORIG_HEAD HEAD)
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
           
           echo "Files changed in merged PR: $CHANGED_FILES"
 
