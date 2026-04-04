@@ -61,6 +61,7 @@ jobs:
           git push origin $branch_name
 
       - name: Create Pull Request
+        id: cpr
         if: steps.check_update.outputs.should_update == 'true'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
@@ -80,5 +81,13 @@ jobs:
               issue_number: result.data.number,
               labels: ['copr-update']
             });
+            return result.data.number;
         env:
           SHA: ${{ steps.check_update.outputs.sha }}
+
+      - name: Enable Auto-Merge for PR
+        if: steps.check_update.outputs.should_update == 'true' && steps.cpr.outputs.result != ''
+        run: |
+          gh pr merge ${{ steps.cpr.outputs.result }} --auto
+        env:
+          GH_TOKEN: ${{ github.token }}
