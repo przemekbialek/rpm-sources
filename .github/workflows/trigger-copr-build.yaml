@@ -1,0 +1,33 @@
+name: Trigger Copr Build on PR Merge
+on:
+  pull_request:
+    types:
+      - closed
+    paths:
+      - "**.spec"
+
+jobs:
+  webhook-trigger:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect changed spec files and trigger webhooks
+        env:
+          WEBHOOK_BASE_URL: ${{ secrets.COPR_WEBHOOK_URL }}
+        run: |
+          CHANGED_FILES=$(git diff --name-only ORIG_HEAD HEAD)
+          
+          echo "Files changed in merged PR: $CHANGED_FILES"
+
+          for file in $CHANGED_FILES; do
+            if [[ $file == *.spec ]]; then
+              SPEC_NAME=$(basename "$file" .spec)
+              
+              echo "Triggering build for $SPEC_NAME..."
+
+              curl -X POST "${WEBHOOK_BASE_URL}/${SPEC_NAME}"
+            fi
+          done
