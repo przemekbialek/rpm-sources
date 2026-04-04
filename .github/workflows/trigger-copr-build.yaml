@@ -17,7 +17,6 @@ jobs:
       - name: Detect changed spec files and trigger webhooks
         env:
           GH_TOKEN: ${{ github.token }}
-          WEBHOOK_BASE_URL: ${{ secrets.COPR_WEBHOOK_URL }}
         run: |
           CHANGED_FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files.[].path')
           
@@ -29,6 +28,6 @@ jobs:
               
               echo "Triggering build for $SPEC_NAME..."
 
-              curl -H "Content-Type: application/json" --data '{}' -X POST ${WEBHOOK_BASE_URL}${SPEC_NAME}/
+              curl -H "Content-Type: application/json" --data '{}' -X POST "${{ secrets.COPR_WEBHOOK_URL }}${SPEC_NAME}"
             fi
           done
