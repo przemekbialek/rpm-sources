@@ -28,6 +28,6 @@ jobs:
               
               echo "Triggering build for $SPEC_NAME..."
 
-              curl -X POST "${WEBHOOK_BASE_URL}/${SPEC_NAME}"
+              curl -X POST "${WEBHOOK_BASE_URL}/${SPEC_NAME}/"
             fi
           done
