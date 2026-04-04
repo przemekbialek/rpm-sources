@@ -1,12 +1,15 @@
-name: Watch Quake3e and update spec (Conditional)
+name: Watch Quake3e and Update Spec
 on:
   schedule:
-    - cron: '55 23 * * *' # Sprawdzanie co godzinę
-  workflow_dispatch: # Możliwość ręcznego uruchomienia
+    - cron: '55 23 * * *'
+  workflow_dispatch:
 
 jobs:
-  build:
+  update-spec:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout bridge repo
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -24,28 +27,27 @@ jobs:
 
           if [ "$LATEST_SHA" != "$CURRENT_SHA" ]; then
             echo "New commit detected! Updating..."
-            echo "should_build=true" >> $GITHUB_OUTPUT
+            echo "should_update=true" >> $GITHUB_OUTPUT
             echo "sha=$LATEST_SHA" >> $GITHUB_OUTPUT
             echo "date=$LATEST_DATE" >> $GITHUB_OUTPUT
           else
-            echo "No changes detected. Skipping build."
-            echo "should_build=false" >> $GITHUB_OUTPUT
+            echo "No changes detected. Skipping update."
+            echo "should_update=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Update SPEC file
-        if: steps.check_update.outputs.should_build == 'true'
+        if: steps.check_update.outputs.should_update == 'true'
         run: |
           SHA=${{ steps.check_update.outputs.sha }}
           DATE=${{ steps.check_update.outputs.date }}
-          
+
           echo "Updating quake3e.spec to SHA: $SHA and Date: $DATE"
-          
-          # Aktualizacja zmiennych w pliku .spec [1]
+
           sed -i "s/^%global commitdate .*/%global commitdate $DATE/" Quake3e/quake3e.spec
           sed -i "s/^%global commithash .*/%global commithash $SHA/" Quake3e/quake3e.spec
-          
+
       - name: Create Branch and Commit Changes
-        if: steps.check_update.outputs.should_build == 'true'
+        if: steps.check_update.outputs.should_update == 'true'
         run: |
           SHA=${{ steps.check_update.outputs.sha }}
 
@@ -58,7 +60,7 @@ jobs:
           git push origin $branch_name
 
       - name: Create Pull Request
-        if: steps.check_update.outputs.should_build == 'true'
+        if: steps.check_update.outputs.should_update == 'true'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
