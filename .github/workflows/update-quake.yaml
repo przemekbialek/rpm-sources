@@ -2,6 +2,7 @@ name: Watch Quake3e and Update Spec
 on:
   schedule:
     - cron: '55 23 * * *'
+      timezone: "Europe/Warsaw"
   workflow_dispatch:
 
 jobs:
