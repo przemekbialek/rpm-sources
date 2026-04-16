@@ -101,6 +101,6 @@ jobs:
       - name: Enable Auto-Merge for PR
         if: steps.check_update.outputs.should_update == 'true' && steps.cpr.outputs.result != ''
         run: |
-          gh pr merge ${{ steps.cpr.outputs.result }} --merge --delete-branch --auto
+          gh pr merge ${{ steps.cpr.outputs.result }} --merge --delete-branch # --auto
         env:
           GH_TOKEN: ${{ secrets.PR_PAT_TOKEN }}
