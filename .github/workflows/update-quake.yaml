@@ -27,7 +27,10 @@ jobs:
 
           LATEST_DATE=$(curl -s https://api.github.com/repos/ec-/Quake3e/commits/main | jq -r '.commit.committer.date' | cut -d'T' -f1 | tr -d '-')
 
-          if [ "$LATEST_SHA" != "$CURRENT_SHA" ]; then
+          if [ "$LATEST_SHA" == "" ]; then
+            echo "Warning! Can't get sha. Aborting changes"
+            echo "should_update=false" >> $GITHUB_OUTPUT
+          elif [ "$LATEST_SHA" != "$CURRENT_SHA" ]; then
             echo "New commit detected! Updating..."
             echo "should_update=true" >> $GITHUB_OUTPUT
             echo "sha=$LATEST_SHA" >> $GITHUB_OUTPUT
