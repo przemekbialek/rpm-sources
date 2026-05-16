@@ -1,5 +1,5 @@
-%global commitdate 20260504
-%global commithash ed1064f80fda9cde2e7d33c2d5dce8f8166b12bd
+%global commitdate 20260516
+%global commithash afcac5360da163e26f7b767370c6f631df57a27c
 %global shortcommit %(c=%{commithash}; echo ${c:0:7})
 %define debug_package %{nil}
 Name:           Quake3e
